@@ -12,3 +12,19 @@ auth.listUsers()
 .then((user) => {
     console.log(JSON.stringify(user) + '\n')
 })
+
+const users = ["hleonardddd@mail.com", "adrienddd@mail.com", "romainddd@mail.com", "laytodddn@mail.com"]
+
+for (const user of users) {
+  auth.createUser({
+    email: user,
+    password: "123456",
+    disabled: false,
+  })
+  .then((userRecord) => {
+    console.log('Successfully created new user:', userRecord.uid);
+  })
+  .catch((error) => {
+    console.log('Error creating new user:', error);
+  });
+}
