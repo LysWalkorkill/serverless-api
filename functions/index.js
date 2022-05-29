@@ -8,7 +8,7 @@ const auth = admin.auth();
 const db = getFirestore();
 
 exports.registerUser = functions.auth.user().onCreate((user) => {
-  console.log("===USER CREATED===\n" + user.email + '\n')
+  console.log("===USER CREATION===\n" + user.email + '\n')
   const docRef = db.collection("users").doc(user.uid);
 
   docRef.set({
@@ -25,12 +25,9 @@ exports.registerUser = functions.auth.user().onCreate((user) => {
 })
 
 exports.unRegisterUser = functions.auth.user().onDelete((user) => {
-  console.log("===USER DELETED===\n" + user.email + '\n')
-  const docRef = db.collection("users").doc();
-
-  docRef.delete({
-    uid: user.uid,
-  }).catch((error) => {
+  console.log("===USER DELETION===\n" + user.email + '\n')
+  const docRef = db.collection("users").doc(user.uid).delete()
+  .catch((error) => {
     functions.logger.error(error, {structuredData: true});
     console.log(error);
   }).then(() => {
