@@ -7,21 +7,14 @@ admin.initializeApp();
 const auth = admin.auth();
 const db = getFirestore();
 
-// Create and Deploy Your First Cloud Functions
-// https://firebase.google.com/docs/functions/write-firebase-functions
-
-exports.helloWorld = functions.https.onRequest((req, res) => {
-  functions.logger.info("Hello logs!", {structuredData: true});
-  res.send("Hello from Firebase!");
-});
-
 exports.registerUser = functions.auth.user().onCreate((user) => {
   console.log("===USER CREATED===\n" + user.email + '\n')
-  const docRef = db.collection("users").doc();
+  const docRef = db.collection("users").doc(user.uid);
 
   docRef.set({
     uid: user.uid,
     email: user.email,
+    group: "user",
   }).catch((error) => {
     functions.logger.error(error, {structuredData: true});
     console.log(error);
@@ -31,35 +24,17 @@ exports.registerUser = functions.auth.user().onCreate((user) => {
   });
 })
 
-exports.getAllUsers = functions.https.onRequest((req, res) => {
-  const tmp = [];
+exports.unRegisterUser = functions.auth.user().onDelete((user) => {
+  console.log("===USER DELETED===\n" + user.email + '\n')
+  const docRef = db.collection("users").doc();
 
-  auth.listUsers().then(async (userRecords) => {
-    const user = await auth.verifyIdToken(req.headers.idtoken)
-    console.log("role Signed-in => " + user.role)
-    userRecords.users.forEach((user) => {
-      tmp.push({id: user.uid, email: user.email});
-    });
+  docRef.delete({
+    uid: user.uid,
   }).catch((error) => {
     functions.logger.error(error, {structuredData: true});
     console.log(error);
   }).then(() => {
-    res.send(JSON.stringify(tmp));
+    console.log("Users collection updated !")
+    res.send("Users collection updated !");
   });
-});
-
-exports.writeMessage = functions.https.onRequest((req, res) => {
-  const docRef = db.collection("messages").doc();
-
-  docRef.set({
-    message: req.body.message,
-    from: req.body.ownerID,
-    to: req.body.receiverID,
-    timestamp: Date.now(),
-  }).catch((error) => {
-    functions.logger.error(error, {structuredData: true});
-    console.log(error);
-  }).then(() => {
-    res.send("Message collection updated !");
-  });
-});
+})
