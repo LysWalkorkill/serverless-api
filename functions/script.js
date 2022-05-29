@@ -1,12 +1,14 @@
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
-const {getFirestore} = require("firebase-admin/firestore");
+var admin = require("firebase-admin");
+var serviceAccount = require("./scriptSA.json");
 
-admin.initializeApp();
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://serverless-architecture-351112-default-rtdb.europe-west1.firebasedatabase.app"
+});
 
-const auth = admin.auth();
-const db = getFirestore();
+const auth = admin.auth()
 
-
-const docRef = db.collection("users").doc();
-
+auth.listUsers()
+.then((user) => {
+    console.log(JSON.stringify(user) + '\n')
+})
