@@ -35,3 +35,11 @@ exports.unRegisterUser = functions.auth.user().onDelete((user) => {
     res.send("Users collection updated !");
   });
 })
+
+exports.deleteUser = functions.firestore.document("/users/{userID}").onDelete((change, ctx) => {
+  auth.deleteUser(ctx.params.userID)
+  .then(() => {
+    console.log(`User ${ctx.params.userID} deleted from Authentication!`)
+    res.send(`User ${ctx.params.userID} deleted from Authentication!`);
+  })
+})
