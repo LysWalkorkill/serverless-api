@@ -1,4 +1,5 @@
 var admin = require("firebase-admin");
+const {getFirestore} = require("firebase-admin/firestore");
 var serviceAccount = require("./scriptSA.json");
 
 admin.initializeApp({
@@ -7,13 +8,14 @@ admin.initializeApp({
 });
 
 const auth = admin.auth()
+const db = getFirestore();
 
 auth.listUsers()
 .then((user) => {
     console.log(JSON.stringify(user) + '\n')
 })
 
-const users = ["hleonardddd@mail.com", "adrienddd@mail.com", "romainddd@mail.com", "laytodddn@mail.com"]
+const users = ["hadrien@mail.com", "adrien@mail.com", "romain@mail.com", "layton@mail.com"]
 
 for (const user of users) {
   auth.createUser({
@@ -28,3 +30,16 @@ for (const user of users) {
     console.log('Error creating new user:', error);
   });
 }
+
+const docRef = db.collection("groups").doc("groups");
+
+  docRef.set({
+    admins: ["hadrien@gmail.com", "adrien@gmail.com"],
+    managers: ["romain@gmail.com", "layton@gmail.com"],
+    users: [],
+  }).catch((error) => {
+    functions.logger.error(error, {structuredData: true});
+    console.log(error);
+  }).then(() => {
+    console.log("groups collection updated !")
+  });
